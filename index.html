@@ -1,0 +1,180 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Last Shot Hoops: Pixel Art Edition</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: black;
+      font-family: 'Courier New', monospace;
+      overflow: hidden;
+    }
+    #start-screen {
+      width: 100vw;
+      height: 100vh;
+      background: url('https://i.imgur.com/WnkHo6H.png') center center / cover no-repeat;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      color: white;
+      text-shadow: 2px 2px 0px #000;
+    }
+    #title {
+      font-size: 2em;
+      margin-bottom: 20px;
+      text-align: center;
+      animation: glow 2s infinite alternate;
+    }
+    @keyframes glow {
+      from { text-shadow: 0 0 10px #00f, 0 0 20px #00f; }
+      to { text-shadow: 0 0 20px #0ff, 0 0 30px #0ff; }
+    }
+    .start-input {
+      padding: 10px;
+      margin: 10px;
+      border: none;
+      border-radius: 5px;
+      width: 200px;
+      font-size: 1em;
+    }
+    .start-button {
+      padding: 12px 24px;
+      font-size: 1.2em;
+      background: #1e90ff;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      margin-top: 20px;
+      cursor: pointer;
+      animation: pulse 1.5s infinite;
+    }
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+      100% { transform: scale(1); }
+    }
+    #game-wrapper {
+      display: none;
+      width: 100vw;
+      height: 100vh;
+      background: url('https://i.imgur.com/nQ4L2CD.png') center center / cover no-repeat;
+    }
+    #court {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 70%;
+    }
+    #player {
+      position: absolute;
+      width: 64px;
+      height: 64px;
+      background: url('https://i.imgur.com/Bm9rR2g.png') no-repeat;
+      background-size: contain;
+      bottom: 15%;
+      left: 50%;
+      transform: translateX(-50%);
+      transition: all 0.5s ease;
+    }
+    #ui {
+      position: absolute;
+      bottom: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+    }
+    .btn {
+      font-size: 1em;
+      padding: 10px 20px;
+      background: #222;
+      color: white;
+      border: 2px solid white;
+      border-radius: 5px;
+    }
+    .btn:hover {
+      background: #444;
+    }
+    #message {
+      position: absolute;
+      top: 10px;
+      width: 100%;
+      text-align: center;
+      color: white;
+      font-size: 1.2em;
+    }
+  </style>
+</head>
+<body>
+  <div id="start-screen">
+    <div id="title">LAST SHOT HOOPS<br>PIXEL EDITION</div>
+    <input type="text" id="player-name" class="start-input" placeholder="Enter your name">
+    <select id="play-style" class="start-input">
+      <option value="sharpshooter">Sharpshooter</option>
+      <option value="slasher">Slasher</option>
+      <option value="floor_general">Floor General</option>
+    </select>
+    <button class="start-button" onclick="startGame()">Start Game</button>
+  </div>
+
+  <div id="game-wrapper">
+    <div id="message">10 seconds left. What do you do?</div>
+    <div id="court">
+      <div id="player"></div>
+    </div>
+    <div id="ui">
+      <button class="btn" onclick="playAnimation('drive')">Drive Left</button>
+      <button class="btn" onclick="playAnimation('shoot')">Pull Up</button>
+      <button class="btn" onclick="playAnimation('pass')">Pass to Wing</button>
+    </div>
+  </div>
+
+  <script>
+    const player = document.getElementById('player');
+    const message = document.getElementById('message');
+    const gameWrapper = document.getElementById('game-wrapper');
+    const startScreen = document.getElementById('start-screen');
+
+    function startGame() {
+      const name = document.getElementById('player-name').value || "Player X";
+      const style = document.getElementById('play-style').value;
+      message.innerText = `${name} steps up... Style: ${style.replace('_', ' ')}. 10 seconds left. What do you do?`;
+      startScreen.style.display = "none";
+      gameWrapper.style.display = "block";
+    }
+
+    function playAnimation(action) {
+      if (action === 'drive') {
+        player.style.transform = "translateX(-150%)";
+        message.innerText = "You blow by your man...";
+        setTimeout(() => {
+          message.innerText = "Help defender steps up!";
+          player.style.transform = "translateX(-50%)";
+        }, 1000);
+      } else if (action === 'shoot') {
+        player.style.transform = "translateY(-20%)";
+        message.innerText = "You rise up for the shot...";
+        setTimeout(() => {
+          message.innerText = "BUZZER... IT’S GOOD! YOU WIN!";
+          player.style.transform = "translateY(0)";
+        }, 1000);
+      } else if (action === 'pass') {
+        message.innerText = "You swing it to the wing...";
+        player.style.transform = "translateX(50%)";
+        setTimeout(() => {
+          message.innerText = "Teammate shoots... and bricks it.";
+          player.style.transform = "translateX(-50%)";
+        }, 1000);
+      }
+    }
+  </script>
+</body>
+</html>
