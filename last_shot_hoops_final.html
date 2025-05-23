@@ -1,0 +1,383 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <script>
+    let buzzer = new Audio("https://freesound.org/data/previews/456/456120_7192550-lq.mp3");
+    let cheer = new Audio("https://freesound.org/data/previews/491/491352_10226594-lq.mp3");
+    let miss = new Audio("https://freesound.org/data/previews/413/413854_5121236-lq.mp3");
+  
+function showSummaryAndReplay(resultText, result) {
+  content.innerHTML = resultText + displayStats() + `
+    <div class="stats">
+      <p><strong>Career Stats:</strong></p>
+      <p>Wins: ${careerStats.wins}</p>
+      <p>Losses: ${careerStats.losses}</p>
+      <p>MVP Moments: ${careerStats.mvps}</p>
+      <button class="choice-btn" onclick="startGame()">Play Again</button>
+    </div>
+  `;
+  scoreboard.innerText = result;
+}
+
+</script>
+  <meta charset="UTF-8">
+  <title>Last Shot Hoops – Stat Edition</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      background: url('https://i.imgur.com/MhT9TxB.jpeg') no-repeat center center fixed;
+      background-size: cover;
+      color: white;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      text-align: center;
+      backdrop-filter: brightness(0.6);
+    }
+    .container {
+      background: rgba(0, 0, 0, 0.7);
+      padding: 20px;
+      max-width: 600px;
+      border-radius: 15px;
+      box-shadow: 0 0 20px #000;
+    }
+    .choice-btn, .start-btn {
+      background-color: #1e90ff;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      padding: 15px;
+      margin: 10px;
+      font-size: 1.2em;
+      width: 80%;
+    }
+    .choice-btn:hover, .start-btn:hover {
+      background-color: #3aa1ff;
+      transform: scale(1.05);
+    }
+    input, select {
+      font-size: 1em;
+      padding: 10px;
+      margin: 10px 0;
+      width: 80%;
+      border-radius: 8px;
+      border: none;
+    }
+    .scoreboard {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      background: rgba(0, 0, 0, 0.5);
+      padding: 10px 15px;
+      border-radius: 10px;
+      font-size: 1em;
+    }
+    .stats {
+      font-size: 0.9em;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div id="crowd" style="position:fixed;top:0;left:0;width:100%;height:100%;z-index:-1;background:url('https://i.imgur.com/Oe4iK5e.png') repeat-x center bottom;opacity:0.1;animation:flicker 3s infinite;"></div>
+  <style>
+    @keyframes flicker {
+      0%, 100% { opacity: 0.12; }
+      50% { opacity: 0.18; }
+    }
+  </style>
+  <div class="scoreboard" id="scoreboard">Score: 100 - 100 | Time: 0:10</div>
+
+  <div class="container" id="game-container">
+    <h1>Last Shot Hoops</h1>
+    <div id="game-content">
+      <p>Enter your player details:</p>
+      <input type="text" id="player-name" placeholder="Name">
+      <input type="number" id="jersey-number" placeholder="Jersey #" min="0" max="99">
+      <select id="play-style">
+        <option value="sharpshooter">Sharpshooter</option>
+        <option value="slasher">Slasher</option>
+        <option value="floor_general">Floor General</option>
+      </select>
+      <br>
+      <button class="start-btn" onclick="startGame()">Start Game</button>
+    </div>
+  </div>
+
+  <script>
+    const container = document.getElementById("game-container");
+    const content = document.getElementById("game-content");
+    const scoreboard = document.getElementById("scoreboard");
+
+    let player = {
+      name: "",
+      jersey: "",
+      style: "",
+      clutch: 70,
+      passing: 70,
+      drive: 70
+    };
+
+    function setStatsByStyle(style) {
+      if (style === "sharpshooter") {
+        player.clutch = 90;
+        player.passing = 60;
+        player.drive = 50;
+      } else if (style === "slasher") {
+        player.clutch = 70;
+        player.passing = 50;
+        player.drive = 90;
+      } else if (style === "floor_general") {
+        player.clutch = 60;
+        player.passing = 90;
+        player.drive = 60;
+      }
+    }
+
+    function displayStats() {
+      return `
+        <div class="stats">
+          <p><strong>Stats:</strong></p>
+          <p>Clutch: ${player.clutch}</p>
+          <p>Passing: ${player.passing}</p>
+          <p>Drive: ${player.drive}</p>
+        </div>
+      `;
+    }
+
+    function startGame() {
+      player.name = document.getElementById("player-name").value || "Player X";
+      player.jersey = document.getElementById("jersey-number").value || "23";
+      player.style = document.getElementById("play-style").value;
+      setStatsByStyle(player.style);
+
+      content.innerHTML = `
+        <p>${player.name} (#${player.jersey}) steps up. Style: ${player.style.replace('_', ' ')}.</p>
+        <p>10 seconds left. You're at the top of the key. What do you do?</p>
+        ${displayStats()}
+        <button class="choice-btn" onclick="makeChoice(1)">Drive left</button><button class="choice-btn" onclick="makeChoice(6)">Call for screen</button>
+        <button class="choice-btn" onclick="makeChoice(2)">Pull up for 3</button>
+        <button class="choice-btn" onclick="makeChoice(3)">Pass to wing</button>
+      `;
+    }
+
+    function makeChoice(choice) {
+      let resultText = "";
+      
+    if (choice === 6) {
+      resultText = `
+        <p>You call for a screen. The big man comes up. Defender gets caught!</p>
+        <button class="choice-btn" onclick="makeChoice(7)">Take open mid-range jumper</button>
+        <button class="choice-btn" onclick="makeChoice(8)">Dish to rolling big</button>
+      `;
+    } else if (choice === 7) {
+      if (player.clutch >= 75) {
+        scoreboard.innerText = "Final Score: 102 - 100 | YOU WIN!";
+        showSummaryAndReplay(`<p>You pull up from mid-range... splash! Ice cold. GAME!</p>`, "Final Score: 102 - 100 | YOU WIN!");
+        updateCareerStats("win", true); cheer.play();
+      } else {
+        scoreboard.innerText = "Final Score: 100 - 101 | GAME OVER";
+        showSummaryAndReplay(`<p>Mid-range jumper... clangs off the rim. So close.</p>`, "Final Score: 100 - 101 | GAME OVER");
+        updateCareerStats("loss"); miss.play();
+      }
+    } else if (choice === 8) {
+      if (player.passing >= 75) {
+        scoreboard.innerText = "Final Score: 102 - 100 | YOU WIN!";
+        showSummaryAndReplay(`<p>You dish it to the rolling big... he slams it home! GAME!</p>`, "Final Score: 102 - 100 | YOU WIN!");
+        updateCareerStats("win", false); cheer.play();
+      } else {
+        scoreboard.innerText = "Final Score: 100 - 101 | GAME OVER";
+        showSummaryAndReplay(`<p>You try to pass... but it's deflected and stolen! Ouch.</p>`, "Final Score: 100 - 101 | GAME OVER");
+        updateCareerStats("loss"); miss.play();
+      }
+    } else if (choice === 1) {
+    
+        resultText = `
+          <p>You drive left, blow by your man! Help defender steps up. What now?</p>
+          <button class="choice-btn" onclick="makeChoice(4)">Euro-step around him</button>
+          <button class="choice-btn" onclick="makeChoice(5)">Kick out to corner</button>
+        `;
+      } else if (choice === 2) {
+        if (player.clutch >= 80) {
+          scoreboard.innerText = "Final Score: 103 - 100 | YOU WIN!";
+          buzzer.play(); showSummaryAndReplay(`<p>You rise for the 3... it's up... IT'S GOOD! BUZZER! YOU WIN!</p>`, "Final Score: 103 - 100 | YOU WIN!");
+        } else {
+          scoreboard.innerText = "Final Score: 100 - 102 | GAME OVER";
+          showSummaryAndReplay(`<p>You rise for the 3... it rims out. Heartbreak.</p>`, "Final Score: 100 - 102 | GAME OVER");
+        }
+      } else if (choice === 3) {
+        if (player.passing >= 80) {
+          scoreboard.innerText = "Final Score: 102 - 100 | YOU WIN!";
+          showSummaryAndReplay(`<p>You pass to the corner... they drain it! You assist the winner!</p>`, "Final Score: 102 - 100 | YOU WIN!");
+        } else {
+          scoreboard.innerText = "Final Score: 100 - 102 | GAME OVER";
+          showSummaryAndReplay(`<p>You pass... the wing hesitates... and bricks it. Game over.</p>`, "Final Score: 100 - 102 | GAME OVER");
+        }
+      } else if (choice === 4) {
+        if (player.drive >= 80) {
+          scoreboard.innerText = "Final Score: 102 - 100 | YOU WIN!";
+          showSummaryAndReplay(`<p>You Euro-step... defender bites... you lay it up... AND ONE!</p>`, "Final Score: 102 - 100 | YOU WIN!");
+        } else {
+          scoreboard.innerText = "Final Score: 100 - 101 | GAME OVER";
+          showSummaryAndReplay(`<p>You Euro-step... but it’s smothered. No bucket.</p>`, "Final Score: 100 - 101 | GAME OVER");
+        }
+      } else if (choice === 5) {
+        scoreboard.innerText = "Final Score: 100 - 101 | GAME OVER";
+        showSummaryAndReplay(`<p>You kick it out... but it's tipped and stolen. Game over.</p>`, "Final Score: 100 - 101 | GAME OVER");
+      }
+
+      content.innerHTML = resultText + displayStats();
+    }
+  
+function showSummaryAndReplay(resultText, result) {
+  content.innerHTML = resultText + displayStats() + `
+    <div class="stats">
+      <p><strong>Career Stats:</strong></p>
+      <p>Wins: ${careerStats.wins}</p>
+      <p>Losses: ${careerStats.losses}</p>
+      <p>MVP Moments: ${careerStats.mvps}</p>
+      <button class="choice-btn" onclick="startGame()">Play Again</button>
+    </div>
+  `;
+  scoreboard.innerText = result;
+}
+
+</script>
+
+<script>
+  // Initialize or load career stats from local storage
+  let careerStats = JSON.parse(localStorage.getItem("careerStats")) || {
+    wins: 0,
+    losses: 0,
+    mvps: 0
+  };
+
+  function updateCareerStats(result, mvp = false) {
+    if (result === "win") careerStats.wins++;
+    else if (result === "loss") careerStats.losses++;
+    if (mvp) careerStats.mvps++;
+
+    localStorage.setItem("careerStats", JSON.stringify(careerStats));
+    displayCareerStats();
+  }
+
+  function displayCareerStats() {
+    const existing = document.getElementById("career-stats");
+    if (existing) existing.remove();
+
+    const careerDiv = document.createElement("div");
+    careerDiv.id = "career-stats";
+    careerDiv.className = "stats";
+    careerDiv.innerHTML = `
+      <p><strong>Career Stats:</strong></p>
+      <p>Wins: ${careerStats.wins}</p>
+      <p>Losses: ${careerStats.losses}</p>
+      <p>MVP Moments: ${careerStats.mvps}</p>
+    `;
+    container.appendChild(careerDiv);
+  }
+
+  // Display career stats on load
+  displayCareerStats();
+
+  // Patch the makeChoice function to track results
+  const originalMakeChoice = makeChoice;
+  makeChoice = function(choice) {
+    let resultText = "";
+    
+    if (choice === 6) {
+      resultText = `
+        <p>You call for a screen. The big man comes up. Defender gets caught!</p>
+        <button class="choice-btn" onclick="makeChoice(7)">Take open mid-range jumper</button>
+        <button class="choice-btn" onclick="makeChoice(8)">Dish to rolling big</button>
+      `;
+    } else if (choice === 7) {
+      if (player.clutch >= 75) {
+        scoreboard.innerText = "Final Score: 102 - 100 | YOU WIN!";
+        showSummaryAndReplay(`<p>You pull up from mid-range... splash! Ice cold. GAME!</p>`, "Final Score: 102 - 100 | YOU WIN!");
+        updateCareerStats("win", true); cheer.play();
+      } else {
+        scoreboard.innerText = "Final Score: 100 - 101 | GAME OVER";
+        showSummaryAndReplay(`<p>Mid-range jumper... clangs off the rim. So close.</p>`, "Final Score: 100 - 101 | GAME OVER");
+        updateCareerStats("loss"); miss.play();
+      }
+    } else if (choice === 8) {
+      if (player.passing >= 75) {
+        scoreboard.innerText = "Final Score: 102 - 100 | YOU WIN!";
+        showSummaryAndReplay(`<p>You dish it to the rolling big... he slams it home! GAME!</p>`, "Final Score: 102 - 100 | YOU WIN!");
+        updateCareerStats("win", false); cheer.play();
+      } else {
+        scoreboard.innerText = "Final Score: 100 - 101 | GAME OVER";
+        showSummaryAndReplay(`<p>You try to pass... but it's deflected and stolen! Ouch.</p>`, "Final Score: 100 - 101 | GAME OVER");
+        updateCareerStats("loss"); miss.play();
+      }
+    } else if (choice === 1) {
+    
+      resultText = `
+        <p>You drive left, blow by your man! Help defender steps up. What now?</p>
+        <button class="choice-btn" onclick="makeChoice(4)">Euro-step around him</button>
+        <button class="choice-btn" onclick="makeChoice(5)">Kick out to corner</button>
+      `;
+    } else if (choice === 2) {
+      if (player.clutch >= 80) {
+        scoreboard.innerText = "Final Score: 103 - 100 | YOU WIN!";
+        buzzer.play(); showSummaryAndReplay(`<p>You rise for the 3... it's up... IT'S GOOD! BUZZER! YOU WIN!</p>`, "Final Score: 103 - 100 | YOU WIN!");
+        updateCareerStats("win", true); cheer.play();
+      } else {
+        scoreboard.innerText = "Final Score: 100 - 102 | GAME OVER";
+        showSummaryAndReplay(`<p>You rise for the 3... it rims out. Heartbreak.</p>`, "Final Score: 100 - 102 | GAME OVER");
+        updateCareerStats("loss"); miss.play();
+      }
+    } else if (choice === 3) {
+      if (player.passing >= 80) {
+        scoreboard.innerText = "Final Score: 102 - 100 | YOU WIN!";
+        showSummaryAndReplay(`<p>You pass to the corner... they drain it! You assist the winner!</p>`, "Final Score: 102 - 100 | YOU WIN!");
+        updateCareerStats("win", false); cheer.play();
+      } else {
+        scoreboard.innerText = "Final Score: 100 - 102 | GAME OVER";
+        showSummaryAndReplay(`<p>You pass... the wing hesitates... and bricks it. Game over.</p>`, "Final Score: 100 - 102 | GAME OVER");
+        updateCareerStats("loss"); miss.play();
+      }
+    } else if (choice === 4) {
+      if (player.drive >= 80) {
+        scoreboard.innerText = "Final Score: 102 - 100 | YOU WIN!";
+        showSummaryAndReplay(`<p>You Euro-step... defender bites... you lay it up... AND ONE!</p>`, "Final Score: 102 - 100 | YOU WIN!");
+        updateCareerStats("win", true); cheer.play();
+      } else {
+        scoreboard.innerText = "Final Score: 100 - 101 | GAME OVER";
+        showSummaryAndReplay(`<p>You Euro-step... but it’s smothered. No bucket.</p>`, "Final Score: 100 - 101 | GAME OVER");
+        updateCareerStats("loss"); miss.play();
+      }
+    } else if (choice === 5) {
+      scoreboard.innerText = "Final Score: 100 - 101 | GAME OVER";
+      showSummaryAndReplay(`<p>You kick it out... but it's tipped and stolen. Game over.</p>`, "Final Score: 100 - 101 | GAME OVER");
+      updateCareerStats("loss"); miss.play();
+    }
+
+    content.innerHTML = resultText + displayStats();
+  }
+
+function showSummaryAndReplay(resultText, result) {
+  content.innerHTML = resultText + displayStats() + `
+    <div class="stats">
+      <p><strong>Career Stats:</strong></p>
+      <p>Wins: ${careerStats.wins}</p>
+      <p>Losses: ${careerStats.losses}</p>
+      <p>MVP Moments: ${careerStats.mvps}</p>
+      <button class="choice-btn" onclick="startGame()">Play Again</button>
+    </div>
+  `;
+  scoreboard.innerText = result;
+}
+
+</script>
+</body>
+
+</html>
