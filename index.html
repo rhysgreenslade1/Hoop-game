@@ -1,0 +1,165 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Last Shot Hoops: Skill Edition</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: black;
+      font-family: 'Courier New', monospace;
+      overflow: hidden;
+    }
+    #game-wrapper {
+      width: 100vw;
+      height: 100vh;
+      background: url('https://kenney.nl/assets/preview/platformer-art-deluxe') center center / cover no-repeat;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+    #message {
+      color: white;
+      text-align: center;
+      font-size: 1.2em;
+      margin-top: 10px;
+    }
+    .btn {
+      font-size: 1em;
+      padding: 10px 20px;
+      background: #222;
+      color: white;
+      border: 2px solid white;
+      border-radius: 5px;
+      margin: 5px;
+    }
+    .btn:hover {
+      background: #444;
+    }
+    #slider-container {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      margin-top: 20px;
+    }
+    .slider-bar {
+      width: 300px;
+      height: 20px;
+      background: #555;
+      border: 2px solid white;
+      position: relative;
+      margin-top: 10px;
+    }
+    .slider-indicator {
+      width: 10px;
+      height: 20px;
+      background: yellow;
+      position: absolute;
+      top: 0;
+      left: 0;
+    }
+    .zone {
+      position: absolute;
+      top: 0;
+      height: 100%;
+    }
+    .zone.green {
+      background: lime;
+      left: 140px;
+      width: 20px;
+    }
+    .zone.yellow {
+      background: gold;
+      left: 110px;
+      width: 80px;
+    }
+    #player-sprite {
+      width: 64px;
+      height: 64px;
+      background: url('https://kenney.nl/assets/platformer-art-deluxe/player.png') no-repeat center center;
+      background-size: contain;
+    }
+  </style>
+</head>
+<body>
+  <div id="game-wrapper">
+    <div id="message">You're at the top of the key. What do you do?</div>
+    <div id="player-sprite"></div>
+    <div id="actions">
+      <button class="btn" onclick="startSlider('drive')">Drive Left</button>
+      <button class="btn" onclick="startSlider('shoot')">Pull Up</button>
+      <button class="btn" onclick="startSlider('pass')">Pass to Wing</button>
+    </div>
+    <div id="slider-container">
+      <div style="color:white">Tap to stop the slider in the green zone!</div>
+      <div class="slider-bar" id="slider-bar">
+        <div class="zone yellow"></div>
+        <div class="zone green"></div>
+        <div class="zone yellow" style="left: 160px;"></div>
+        <div class="slider-indicator" id="indicator"></div>
+      </div>
+      <button class="btn" onclick="stopSlider()">Tap!</button>
+    </div>
+  </div>
+
+  <script>
+    const message = document.getElementById('message');
+    const actions = document.getElementById('actions');
+    const sliderContainer = document.getElementById('slider-container');
+    const indicator = document.getElementById('indicator');
+    let sliderInterval;
+    let sliderPos = 0;
+    let direction = 1;
+    let actionType = "";
+
+    function startSlider(action) {
+      actionType = action;
+      actions.style.display = "none";
+      sliderContainer.style.display = "flex";
+      sliderPos = 0;
+      direction = 1;
+      indicator.style.left = "0px";
+
+      sliderInterval = setInterval(() => {
+        sliderPos += 5 * direction;
+        if (sliderPos >= 290 || sliderPos <= 0) direction *= -1;
+        indicator.style.left = sliderPos + "px";
+      }, 20);
+    }
+
+    function stopSlider() {
+      clearInterval(sliderInterval);
+      sliderContainer.style.display = "none";
+
+      let outcome = "Miss!";
+      if (sliderPos >= 140 && sliderPos <= 150) {
+        outcome = "PERFECT!";
+      } else if ((sliderPos >= 110 && sliderPos < 140) || (sliderPos > 150 && sliderPos <= 190)) {
+        outcome = "Good!";
+      }
+
+      if (actionType === "shoot") {
+        message.innerText = outcome === "PERFECT!" ? "It's GOOD! YOU WIN!" :
+                            outcome === "Good!" ? "It's up... and rattles in! Victory!" :
+                            "You brick the shot. Heartbreak.";
+      } else if (actionType === "pass") {
+        message.innerText = outcome === "PERFECT!" ? "Perfect dime to the corner — splash!" :
+                            outcome === "Good!" ? "Pass caught, shot goes in!" :
+                            "Intercepted! Bad pass!";
+      } else if (actionType === "drive") {
+        message.innerText = outcome === "PERFECT!" ? "Blow-by and finish at the rim!" :
+                            outcome === "Good!" ? "You get by and score through contact!" :
+                            "Stoned at the rim. No bucket.";
+      }
+
+      actions.style.display = "flex";
+    }
+  </script>
+</body>
+</html>
