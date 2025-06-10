@@ -109,6 +109,7 @@
     </div>
   </div>
 
+  <script src="gameLogic.js"></script>
   <script>
     const message = document.getElementById('message');
     const actions = document.getElementById('actions');
@@ -138,12 +139,7 @@
       clearInterval(sliderInterval);
       sliderContainer.style.display = "none";
 
-      let outcome = "Miss!";
-      if (sliderPos >= 140 && sliderPos <= 150) {
-        outcome = "PERFECT!";
-      } else if ((sliderPos >= 110 && sliderPos < 140) || (sliderPos > 150 && sliderPos <= 190)) {
-        outcome = "Good!";
-      }
+      const outcome = getOutcome(sliderPos);
 
       if (actionType === "shoot") {
         message.innerText = outcome === "PERFECT!" ? "It's GOOD! YOU WIN!" :
